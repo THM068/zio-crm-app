@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="sbt: dev.zio:zio-crypto_2.12:0.0.0+120-8d0af0b1-SNAPSHOT:jar" external-system-id="SBT">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/oss.sonatype.org/content/repositories/snapshots/dev/zio/zio-crypto_2.12/0.0.0%2B120-8d0af0b1-SNAPSHOT/zio-crypto_2.12-0.0.0%2B120-8d0af0b1-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/oss.sonatype.org/content/repositories/snapshots/dev/zio/zio-crypto_2.12/0.0.0%2B120-8d0af0b1-SNAPSHOT/zio-crypto_2.12-0.0.0%2B120-8d0af0b1-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/oss.sonatype.org/content/repositories/snapshots/dev/zio/zio-crypto_2.12/0.0.0%2B120-8d0af0b1-SNAPSHOT/zio-crypto_2.12-0.0.0%2B120-8d0af0b1-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

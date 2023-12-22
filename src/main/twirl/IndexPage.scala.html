@@ -1,0 +1,18 @@
+@import html.main
+@(items: List[String], name: String = "Home")
+@sub_template = @{}
+@main(name) {
+  <h1>Welcome to My Web Page</h1>
+  <p>This is a paragraph of text in my web page. It can contain various details about me or the subject of the page.</p>
+  <ul>
+  @for(item <- items) {
+    <li>@item</li>
+  }
+
+  </ul>
+  <a href="https://example.com">Click here to go to example.com</a>
+}
+
+
+
+

@@ -1,0 +1,6 @@
+[0m[[0m[0mdebug[0m] [0m[0mCopy resource mappings: [0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/tma24/private_projects/vrm-app/src/main/resources/logback.xml,/Users/tma24/private_projects/vrm-app/target/scala-2.12/classes/logback.xml)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/tma24/private_projects/vrm-app/src/main/resources/application.conf,/Users/tma24/private_projects/vrm-app/target/scala-2.12/classes/application.conf)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/tma24/private_projects/vrm-app/src/main/resources/web/assets/css/bootstrap.min.css,/Users/tma24/private_projects/vrm-app/target/scala-2.12/classes/web/assets/css/bootstrap.min.css)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/tma24/private_projects/vrm-app/src/main/resources/web/assets/css/custom.css,/Users/tma24/private_projects/vrm-app/target/scala-2.12/classes/web/assets/css/custom.css)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/tma24/private_projects/vrm-app/src/main/resources/web/assets/js/custom.js,/Users/tma24/private_projects/vrm-app/target/scala-2.12/classes/web/assets/js/custom.js)[0m
