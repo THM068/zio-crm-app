@@ -2,13 +2,7 @@ package com.crm.server.routes
 
 import com.crm.server.renderer.ViewRenderer
 import zio.ZLayer
-import zio.http.Method.GET
 import zio.http._
-import zio.http.codec.PathCodec
-import zio.http.codec.PathCodec.int
-import zio.http.endpoint.Endpoint
-
-import java.io.File
 
 class HomeRoute() {
 
@@ -17,8 +11,13 @@ class HomeRoute() {
     ViewRenderer.render(content.body)
   }
 
+  val about = Method.GET / "about" -> handler {
+    val content = html.about.render("Home")
+    ViewRenderer.render(content.body)
+  }
 
-  val apps: HttpApp[Any] = Routes(index)
+
+  val apps: HttpApp[Any] = Routes(index, about)
     .handleError(handle)
     .sandbox
     .toHttpApp
