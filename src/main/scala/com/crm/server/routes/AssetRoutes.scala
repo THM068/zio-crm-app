@@ -7,8 +7,9 @@ import java.io.File
 
 class AssetRoutes {
   private val cssList = List("/custom.css", "bootstrap.min.css")
+  private val jsList = List("/htmx.min.js")
 
-  val apps: HttpApp[Any] = Routes.fromIterable(cssRoutes())
+  val apps: HttpApp[Any] = Routes.fromIterable(cssRoutes() ++ jsRoutes())
     .handleError(handle)
     .sandbox
     .toHttpApp
@@ -20,6 +21,11 @@ class AssetRoutes {
   private def cssRoutes() = cssList.map { filename =>
     Method.GET / "assets" / filename ->  Handler.fromFile(new File
     (s"src/main/resources/web/assets/css/${filename}"))
+  }
+
+  private def jsRoutes() = jsList.map { filename =>
+    Method.GET / "assets" / filename ->  Handler.fromFile(new File
+    (s"src/main/resources/web/assets/js/${filename}"))
   }
 
 
