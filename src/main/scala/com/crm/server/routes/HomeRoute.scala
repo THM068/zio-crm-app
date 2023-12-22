@@ -7,17 +7,21 @@ import zio.http._
 class HomeRoute() {
 
   val index = Method.GET / "" -> handler {
-    val content = html.IndexPage.render(List("Apple", "Oranges", "Mangoes"), "Home")
+    val content = html.IndexPage(List("Apple", "Oranges", "Mangoes"), "Home")
     ViewRenderer.render(content.body)
   }
 
   val about = Method.GET / "about" -> handler {
-    val content = html.about.render("Home")
+    val content = html.about()
     ViewRenderer.render(content.body)
   }
 
+  val contact = Method.GET / "contact" -> handler {
+    val content = html.contact()
+    ViewRenderer.render(content.body)
+  }
 
-  val apps: HttpApp[Any] = Routes(index, about)
+  val apps: HttpApp[Any] = Routes(index, about, contact)
     .handleError(handle)
     .sandbox
     .toHttpApp

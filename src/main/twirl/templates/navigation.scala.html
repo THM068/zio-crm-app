@@ -8,7 +8,13 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">
+      <a class="navbar-brand" href="/"
+      hx-push-url="true"
+      hx-get="/"
+      hx-trigger="click"
+      hx-target="#parent-div"
+      hx-swap="innerHTML"
+      >
         CRM
       </a>
     </div>
@@ -20,12 +26,17 @@
           hx-get="/"
           hx-trigger="click"
           hx-target="#parent-div"
-          hx-swap="outerHTML">
+          hx-swap="innerHTML">
             Home
           </a>
         </li>
         <li>
-          <a href="/about">
+          <a href="/about"
+          hx-push-url="true"
+          hx-get="/about"
+          hx-trigger="click"
+          hx-target="#parent-div"
+          hx-swap="innerHTML">
             About
           </a>
         </li>
@@ -35,11 +46,12 @@
           hx-get="/contact"
           hx-trigger="click"
           hx-target="#parent-div"
-          hx-swap="outerHTML">
+          hx-swap="innerHTML"
+          >
             Contact
           </a>
         </li>
       </ul>
     </div>
   </div>
-  </nav>
+</nav>
