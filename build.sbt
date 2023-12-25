@@ -24,6 +24,7 @@ lazy val root = (project in file("."))
       "com.pauldijou" %% "jwt-json4s-jackson" % "5.0.0",
       "dev.zio" %% "zio-streams" % "2.0.9",
       "dev.zio" %% "zio-crypto" % "0.0.0+120-8d0af0b1-SNAPSHOT",
+      "dev.zio" %% "zio-prelude" % "1.0.0-RC21",
       "dev.zio" %% "zio-test" % "2.0.19" % Test
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")

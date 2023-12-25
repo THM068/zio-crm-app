@@ -3,5 +3,34 @@
 @main(name) {
   <h1>Welcome to the About page</h1>
 
+  <div x-data="{
+     name: 'Groceries',
+     current: '',
+     list: ['Apples', 'Oranges', 'Mangoes'],
+     count: 0,
+     add() {
+      this.list.push(this.current)
+     }
+  }" class="mt-4">
 
+  <h1 x-text="name"></h1>
+  <div class="input-group">
+    <input x-model="current" type="text">
+    <button x-on:click="add" class="btn btn-primary position-relative">Add
+      <span x-text="list.length" class="position-absolute top-0 start-100 translate-middle
+      badge rounded-pill bg-danger"></span>
+    </button>
+  </div>
+
+
+  <ul class="list-group">
+    <template x-for="item in list">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span x-text="item"></span>
+          <button class="btn btn-sm bt-small btn-danger">&times;</button>
+
+        </li>
+    </template>
+  </ul>
+  </div>
 }
