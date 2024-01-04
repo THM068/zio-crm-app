@@ -1,0 +1,15 @@
+@import html.main
+@(name: String = "click to edit")
+
+@main(name) {
+  <h3>Click to Edit form</h3>
+  <div
+  hx-get="/contact-form"
+  hx-trigger="load"
+  hx-swap="innerHtml"
+  >
+    click me
+  </div>
+
+}
+

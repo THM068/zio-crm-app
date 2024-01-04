@@ -1,12 +1,12 @@
 package com.crm.server
 
-import com.crm.server.routes.{AssetRoutes, HomeRoute}
+import com.crm.server.routes.{AssetRoutes, ExampleRoutes, HomeRoute}
 import zio._
 import zio.http.Server
 
-case class AppServer(homeRoute: HomeRoute, assetRoutes: AssetRoutes) {
+case class AppServer(homeRoute: HomeRoute, exampleRoutes: ExampleRoutes, assetRoutes: AssetRoutes) {
 
-  val apps = homeRoute.apps ++ assetRoutes.apps
+  val apps = homeRoute.apps ++ assetRoutes.apps ++ exampleRoutes.apps
   val port = 9999
 
   def runServer(): ZIO[Any, Throwable, Unit] = for {
@@ -17,6 +17,6 @@ case class AppServer(homeRoute: HomeRoute, assetRoutes: AssetRoutes) {
 }
 
 object AppServer {
-  val layer: ZLayer[HomeRoute with AssetRoutes, Nothing, AppServer] =
+  val layer: ZLayer[HomeRoute with AssetRoutes with ExampleRoutes, Nothing, AppServer] =
     ZLayer.fromFunction(AppServer.apply _)
 }

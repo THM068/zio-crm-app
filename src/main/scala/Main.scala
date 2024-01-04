@@ -1,5 +1,5 @@
 import com.crm.server.AppServer
-import com.crm.server.routes.{AssetRoutes, HomeRoute}
+import com.crm.server.routes.{AssetRoutes, ExampleRoutes, HomeRoute}
 import zio._
 import zio.Console.printLine
 
@@ -9,7 +9,8 @@ object Main extends ZIOAppDefault {
       .provide(
         AppServer.layer,
         HomeRoute.layer,
-        AssetRoutes.layer
+        AssetRoutes.layer,
+        ExampleRoutes.layer
       )
   } yield ()
 }

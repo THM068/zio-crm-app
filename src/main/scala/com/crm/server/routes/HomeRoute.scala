@@ -1,9 +1,8 @@
 package com.crm.server.routes
-import com.crm.model.{AppError, Contact}
-import zio.prelude.Validation
 import com.crm.server.renderer.ViewRenderer
 import zio._
 import zio.http._
+import html._
 
 class HomeRoute() {
 
@@ -22,26 +21,10 @@ class HomeRoute() {
     ViewRenderer.render(content.body)
   }
 
-  val contactPost = Method.POST / "contact" -> handler { (request: Request) =>
-    (for {
-      contactFormMap <- Contact.getFormAsMap(request)
-      validationForm <- ZIO.fromOption(Contact.validateInput(contactFormMap))
-      contact = validationForm.getOrElseWith(error => error.mkString(","))
 
-    } yield {
-      contact match {
-        case c @ Contact(name, surname,email ) =>  Response.text(s"success ${c}")
-        case msg => Response.text(s"error ${msg}").status(Status.BadRequest)
-      }
 
-    }).catchSome {
-      case AppError.MissingBodyError(message) =>
-        ZIO.succeed(Response.text(s"error ${message}"))
-    }
-  }
-
-  val apps: HttpApp[Any] = Routes(index, about, contact, contactPost)
-    .handleError { t => Response.text("The error is " + t).status(Status
+  val apps: HttpApp[Any] = Routes(index, about, contact)
+    .handleError { t: Throwable => Response.text("The error is " + t).status(Status
       .InternalServerError) }
     .toHttpApp
 

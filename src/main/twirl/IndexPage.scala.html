@@ -2,12 +2,27 @@
 @(items: List[String], name: String = "Home")
 @sub_template = @{}
 @main(name) {
-  <h1>Welcome to My Web Page</h1>
-  <p>This is a paragraph of text in my web page. It can contain various details about me or the subject of the page.</p>
-  <ul>
-  @for(item <- items) {
-    <li>@item</li>
-  }
+  <h3>Welcome to ZIO Web examples</h3>
+  <p>
+    All the examples below are from <a href="https://htmx.org/examples/">https://htmx
+      .org/examples</a> with a zio backend
+  </p>
+  <table class="table">
+    <tr>
+      <th>Pattern</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>
+        <a href="/click-to-edit">
+          Click To Edit
+        </a>
+      </td>
+      <td>
+        Demonstrates inline editing of a data object
+      </td>
+    </tr>
+  </table>
 
   </ul>
   <a href="https://example.com">Click here to go to example.com</a>
