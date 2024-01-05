@@ -1,0 +1,6 @@
+@import com.crm.model.Joke
+@(joke: Joke)
+
+<div hx-swap-oob="innerHTML:#content">
+  @joke.joke
+</div>

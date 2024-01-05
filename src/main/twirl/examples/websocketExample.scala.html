@@ -1,0 +1,17 @@
+@import html.main
+@(id: String, name: String = "Websocket example")
+
+@main(name) {
+  <h3>Dad Joke Websocket example</h3>
+  <p>
+    Every five seconds a new dad joke is displayed.
+  </p>
+
+  <div hx-ext="ws" ws-connect="/joke-subscription/@{id}">
+  </div>
+  <div id="content"  class="alert alert-success">
+    How are false teeth like stars? They come out at night!
+  </div>
+
+
+}

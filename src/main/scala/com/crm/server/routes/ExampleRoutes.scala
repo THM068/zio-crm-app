@@ -4,6 +4,8 @@ import com.crm.server.renderer.ViewRenderer
 import zio.ZLayer
 import zio.http.{HttpApp, Method, Response, Routes, Status, handler}
 
+import java.util.UUID
+
 class ExampleRoutes {
 
   val clickToEdit = Method.GET / "click-to-edit" -> handler {
@@ -26,8 +28,14 @@ class ExampleRoutes {
     ViewRenderer.render(content.body)
   }
 
+  val websocketDadJokeExample = Method.GET / "dad-joke-websocket-example" -> handler {
+    val id = "dadjoke"//UUID.randomUUID().toString
+    val content = examples.html.websocketExample(id)
+    ViewRenderer.render(content.body)
+  }
+
   val apps: HttpApp[Any] =
-    Routes(clickToEdit, contactForm, editContactForm, contactFormPut)
+    Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample)
     .handleError { t: Throwable => Response.text("The error is " + t).status(Status
       .InternalServerError) }
     .toHttpApp
