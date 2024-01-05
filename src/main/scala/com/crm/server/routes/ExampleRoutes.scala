@@ -29,7 +29,7 @@ class ExampleRoutes {
   }
 
   val websocketDadJokeExample = Method.GET / "dad-joke-websocket-example" -> handler {
-    val id = "dadjoke"//UUID.randomUUID().toString
+    val id = UUID.randomUUID().toString
     val content = examples.html.websocketExample(id)
     ViewRenderer.render(content.body)
   }
