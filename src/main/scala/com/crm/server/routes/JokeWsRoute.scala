@@ -1,7 +1,7 @@
 package com.crm.server.routes
 
 import com.crm.services.JokeService
-import zio.{Random, ZIO, ZLayer, durationInt}
+import zio._
 import zio.http.ChannelEvent.{Read, Unregistered, UserEvent, UserEventTriggered}
 import zio.http.codec.PathCodec.string
 import zio.http.{Handler, HttpApp, Method, Request, Response, Routes, WebSocketApp, WebSocketChannel, WebSocketFrame, handler}
@@ -23,7 +23,7 @@ class JokeWsRoute {
           channel.send(Read(WebSocketFrame.text("Greetings from Dad Jokes!")))
         case Unregistered =>
           ZIO.succeed(JokeTickerBroadCaster.unRegister(clientId)) *>
-            ZIO.log(s"${clientId} has disconnected")
+            ZIO.log(s"${clientId} has disconnected >>>>>")
         case _ =>
           ZIO.unit
       }
@@ -54,16 +54,21 @@ object JokeTickerBroadCaster {
 
   def unRegister(clientId: String) = clientsMap.remove(clientId)
 
+  def getJoke = (for {
+    jokeService <- ZIO.service[JokeService]
+    joke <- jokeService.getJoke()
+  } yield joke)
+
   private def notifiyClients(): ZIO[JokeService, Throwable, Any] =
+    getJoke.flatMap { joke =>
+      val content = examples.snippets.html.dadjoke(joke).body
       ZIO.foreachDiscard(clientsMap.map { case (key, value) => (key, value) }) { entry =>
         val channel = entry._2
         for {
-          jokeService <- ZIO.service[JokeService]
-          joke <- jokeService.getJoke()
-          content = examples.snippets.html.dadjoke(joke)
-          _ <- channel.send(Read(WebSocketFrame.Text(content.body)))
+          _ <- channel.send(Read(WebSocketFrame.Text(content)))
         } yield ()
       }
+    }
 
   def scheduleNotification = notifiyClients().repeat(
     zio.Schedule.spaced(5.seconds) &&
