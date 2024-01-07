@@ -52,9 +52,8 @@ class ExampleRoutes {
         case _ => ""
       }
       idList = idsString.split(",").toList
-
+      list = ContactService.activatefor(idList)
     } yield {
-      val list = ContactService.activatefor(idList)
       val content = examples.snippets.html.contactlistbody(list, idList, "activate")
       ViewRenderer.render(content.body)
     }
@@ -68,9 +67,8 @@ class ExampleRoutes {
         case _ => ""
       }
       idList = idsString.split(",").toList
-
+      list = ContactService.deActivatefor(idList)
     } yield {
-      val list = ContactService.deActivatefor(idList)
       val content = examples.snippets.html.contactlistbody(list, idList, "deactivate")
       ViewRenderer.render(content.body)
     }
