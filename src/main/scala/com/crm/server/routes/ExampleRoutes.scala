@@ -1,8 +1,9 @@
 package com.crm.server.routes
 import examples.html.clickToEdit
 import com.crm.server.renderer.ViewRenderer
+import com.crm.services.ContactService
 import zio.ZLayer
-import zio.http.{HttpApp, Method, Response, Routes, Status, handler}
+import zio.http.{HttpApp, Method, Request, Response, Routes, Status, handler}
 
 import java.util.UUID
 
@@ -34,8 +35,51 @@ class ExampleRoutes {
     ViewRenderer.render(content.body)
   }
 
+  val bulkUpdate = Method.GET / "bulk-update" -> handler {
+    val content = examples.html.bulkupdate()
+    ViewRenderer.render(content.body)
+  }
+  val loadBulkContacts = Method.GET / "load-bulk-contacts" -> handler {
+    val content = examples.snippets.html.loadbulkcontacts(ContactService.contacts())
+    ViewRenderer.render(content.body)
+  }
+
+  val activateContact = Method.PUT / "activate" -> handler { (request: Request) =>
+    for {
+      payloadForm <- request.body.asURLEncodedForm
+      idsString = payloadForm.get("ids") match {
+        case Some(formfield) => formfield.stringValue.getOrElse("")
+        case _ => ""
+      }
+      idList = idsString.split(",").toList
+
+    } yield {
+      val list = ContactService.activatefor(idList)
+      val content = examples.snippets.html.contactlistbody(list, idList, "activate")
+      ViewRenderer.render(content.body)
+    }
+  }
+
+  val deActivateContact = Method.PUT / "deactivate" -> handler { (request: Request) =>
+    for {
+      payloadForm <- request.body.asURLEncodedForm
+      idsString = payloadForm.get("ids") match {
+        case Some(formfield) => formfield.stringValue.getOrElse("")
+        case _ => ""
+      }
+      idList = idsString.split(",").toList
+
+    } yield {
+      val list = ContactService.deActivatefor(idList)
+      val content = examples.snippets.html.contactlistbody(list, idList, "deactivate")
+      ViewRenderer.render(content.body)
+    }
+  }
+
+
   val apps: HttpApp[Any] =
-    Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample)
+    Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
+      bulkUpdate, loadBulkContacts, activateContact, deActivateContact)
     .handleError { t: Throwable => Response.text("The error is " + t).status(Status
       .InternalServerError) }
     .toHttpApp

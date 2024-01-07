@@ -1,0 +1,29 @@
+@import com.crm.model.ContactDTO
+@(contacts: List[ContactDTO])
+
+<form id="checked-contacts">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+      @for(contact <- contacts) {
+        <tr class="">
+          <td><input type='checkbox' name='ids' value="@{contact.id}"></td>
+          <td>@{contact.name}</td>
+          <td>@{contact.email}</td>
+          <td>@{contact.status}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</form>
+<div hx-include="#checked-contacts" hx-target="#tbody">
+  <button class="btn btn-primary" hx-put="/activate">Activate</button>
+  <button class="btn btn-danger" hx-put="/deactivate">Deactivate</button>
+</div>

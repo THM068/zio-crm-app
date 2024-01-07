@@ -1,0 +1,11 @@
+@import html.main
+@(name: String = "Bulk update")
+
+@main(name) {
+  <h3>Bulk Update</h3>
+  <div hx-get="/load-bulk-contacts" hx-trigger="load" hx-swap="innerHTML">
+    load contacts
+  </div>
+
+}
+

@@ -1,0 +1,11 @@
+@import com.crm.model.ContactDTO
+@(contacts: List[ContactDTO], ids: List[String], action: String)
+
+@for(contact <- contacts) {
+  <tr class="@{if(ids.contains(contact.id)) action else ""}">
+    <td><input type='checkbox' name='ids' value="@{contact.id}"></td>
+    <td>@{contact.name}</td>
+    <td>@{contact.email}</td>
+    <td>@{contact.status}</td>
+  </tr>
+}
