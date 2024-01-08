@@ -8,6 +8,8 @@ trait ContactService {
   def contacts(): List[ContactDTO]
   def activatefor(ids: List[String]): List[ContactDTO]
   def deActivatefor(ids: List[String]): List[ContactDTO]
+
+  def deleteContact(id: String): Unit
 }
 
 object ContactService extends ContactService {
@@ -32,4 +34,5 @@ object ContactService extends ContactService {
     contact.toContactDTO
   }.toList
 
+  override def deleteContact(id: String): Unit = ContactDb.contacts.remove(id)
 }

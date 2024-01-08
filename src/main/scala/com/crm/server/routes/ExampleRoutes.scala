@@ -3,7 +3,7 @@ import examples.html.clickToEdit
 import com.crm.server.renderer.ViewRenderer
 import com.crm.services.ContactService
 import zio.ZLayer
-import zio.http.{HttpApp, Method, Request, Response, Routes, Status, handler}
+import zio.http.{HttpApp, Method, Request, Response, Routes, Status, handler, string}
 
 import java.util.UUID
 
@@ -74,10 +74,26 @@ class ExampleRoutes {
     }
   }
 
+  val deleteRowPage = Method.GET / "delete-row" -> handler {
+    val content = examples.html.deleterow()
+    ViewRenderer.render(content.body)
+  }
+
+  val loadDeleteRows = Method.GET / "load-delete-rows" -> handler {
+    val content = examples.snippets.html.loaddeleterows(ContactService.contacts())
+    ViewRenderer.render(content.body)
+  }
+
+  val deleteRow = Method.DELETE / "contact" / string("id") -> handler { ( id: String, _: Request) =>
+    ContactService.deleteContact(id)
+    ViewRenderer.render("")
+  }
+
 
   val apps: HttpApp[Any] =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
-      bulkUpdate, loadBulkContacts, activateContact, deActivateContact)
+      bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
+      loadDeleteRows, deleteRow)
     .handleError { t: Throwable => Response.text("The error is " + t).status(Status
       .InternalServerError) }
     .toHttpApp
