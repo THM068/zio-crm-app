@@ -10,6 +10,10 @@ trait ContactService {
   def deActivatefor(ids: List[String]): List[ContactDTO]
 
   def deleteContact(id: String): Unit
+
+  def getContact(id: String): Option[ContactDTO]
+
+  def updateContact(contact: Contact): Contact
 }
 
 object ContactService extends ContactService {
@@ -17,6 +21,7 @@ object ContactService extends ContactService {
     for(id <- ids) {
       val contact = ContactDb.contacts(id)
       ContactDb.contacts(id) = contact.copy(status = Active)
+
     }
     contactDtoList
   }
@@ -35,4 +40,12 @@ object ContactService extends ContactService {
   }.toList
 
   override def deleteContact(id: String): Unit = ContactDb.contacts.remove(id)
+
+  override def getContact(id: String): Option[ContactDTO] =
+    ContactDb.contacts.get(id).map(_.toContactDTO)
+
+  override def updateContact(contact: Contact): Contact = {
+    ContactDb.contacts(contact.id) = contact
+    contact
+  }
 }

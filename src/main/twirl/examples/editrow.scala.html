@@ -1,0 +1,10 @@
+@import html.main
+@(name: String = "Edit Row")
+
+@main(name) {
+  <h3>Edit Row</h3>
+  <div hx-get="/load-edit-rows" hx-trigger="load" hx-swap="innerHTML">
+    load rows to be deleted
+  </div>
+
+}

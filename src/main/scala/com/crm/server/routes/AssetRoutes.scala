@@ -7,7 +7,8 @@ import java.io.File
 
 class AssetRoutes {
   private val cssList = List("/custom.css", "bootstrap.min.css")
-  private val jsList = List("/htmx.min.js", "alpine.min.js", "tailwind.js", "htmx-ws.js")
+  private val jsList = List("/htmx.min.js", "alpine.min.js", "tailwind.js", "htmx-ws.js",
+    "hyperscript.min.js")
 
   val apps: HttpApp[Any] = Routes.fromIterable(cssRoutes() ++ jsRoutes())
     .handleError(handle)

@@ -1,0 +1,38 @@
+@import com.crm.model.ContactDTO
+@(contacts: List[ContactDTO])
+
+<table class="table delete-row-example">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody hx-target="closest tr" hx-swap="outerHTML">
+    @for(contact <- contacts) {
+      <tr>
+        <td>@{contact.name}</td>
+        <td>@{contact.email}</td>
+        <td>
+          <button class="btn btn-danger"
+          hx-get="/contact/@{contact.id}/edit"
+          hx-trigger="edit" _="on click
+                     if .editing is not empty
+                       Swal.fire({title: 'Already Editing',
+                                  showCancelButton: true,
+                                  confirmButtonText: 'Yep, Edit This Row!',
+                                  text:'Hey!  You are already editing a row!  Do you want to cancel that edit and continue?'})
+                       if the result's isConfirmed is false
+                         halt
+                       end
+                       send cancel to .editing
+                     end
+                     trigger edit">
+          Edit
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

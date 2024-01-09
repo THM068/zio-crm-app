@@ -26,7 +26,10 @@ case class Contact(id: String, name: String, email: String, status: Status) {
     ContactDTO(id, name, email, if(status == Active) "Active"
     else "Inactive")
 }
-case class ContactDTO(id: String, name: String, email: String, status: String)
+case class ContactDTO(id: String, name: String, email: String, status: String) {
+  def toContact =
+    Contact(id = id, name = name, email = email, status = if(status == "Active") Active else Inactive )
+}
 
 object ContactDb {
   import scala.collection.mutable.Map
