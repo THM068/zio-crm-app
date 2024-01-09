@@ -3,12 +3,15 @@ package com.crm.server.routes
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.services.ContactService
-import zio.ZLayer
-import zio.http.{HttpApp, Method, Request, Response, Routes, Status, handler, string}
+import zio.{ZIO, ZLayer}
+import zio.http.endpoint.EndpointNotFound
+import zio.http.{HttpApp, Method, Request, Response, Route, RoutePattern, Routes, Status, handler, string}
 
 import java.util.UUID
 
 class ExampleRoutes {
+
+  val notFound = RoutePattern.any
 
   val clickToEdit = Method.GET / "click-to-edit" -> handler {
     val content = examples.html.clickToEdit()
@@ -142,7 +145,10 @@ class ExampleRoutes {
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
       loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact, getContactRow)
       .handleError { t: Throwable =>
-        Response.text("The error is " + t).status(Status
+        if(t.isInstanceOf[EndpointNotFound])
+          Response.text("Not found")
+        else
+          Response.text("The error is " + t).status(Status
           .InternalServerError)
       }
       .toHttpApp

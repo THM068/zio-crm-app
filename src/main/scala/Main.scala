@@ -1,5 +1,5 @@
 import com.crm.server.AppServer
-import com.crm.server.routes.{AssetRoutes, ExampleRoutes, HomeRoute, JokeTickerBroadCaster, JokeWsRoute}
+import com.crm.server.routes.{AssetRoutes, ExampleRoutes, HomeRoute, JokeTickerBroadCaster, JokeWsRoute, NotFoundRoute}
 import com.crm.services.JokeService
 import zio._
 import zio.Console.printLine
@@ -13,7 +13,8 @@ object Main extends ZIOAppDefault {
         HomeRoute.layer,
         AssetRoutes.layer,
         ExampleRoutes.layer,
-        JokeWsRoute.layer
+        JokeWsRoute.layer,
+        NotFoundRoute.layer
       )
   } yield ()
 }
