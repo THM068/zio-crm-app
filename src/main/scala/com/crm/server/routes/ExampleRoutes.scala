@@ -155,19 +155,27 @@ class ExampleRoutes {
   }
 
   val login = Method.POST / "login"  -> handler { (request: Request) =>
-    for {
+    val formPayloadRequest = for {
       formPayLoad <- request.body.asURLEncodedForm
-      loginDTO = new LoginDTO()
-      validation =  validateLogin(formPayLoad.get("email"),
-                                  formPayLoad.get("password"), loginDTO)
-    } yield validation match {
-      case Success(log, value) =>
-        Response.text("Form entries are valid")
-      case Validation.Failure(log, errors) =>
-        val content = examples.snippets.html.validatedform(errors, loginDTO)
-        render(content.body)
+    } yield formPayLoad
+
+    formPayloadRequest.flatMap {fr =>
+      val loginDTO = new LoginDTO()
+      val validation =  validateLogin(fr.get("email"),
+        fr.get("password"), loginDTO)
+
+      validation.fold (
+        failure =>{
+          val content = examples.snippets.html.validatedform(failure, loginDTO)
+          ZIO.succeed(render(content.body))
+        },
+        success => {
+          ZIO.succeed(Response.text(s"Form entries are valid ${success}"))
+        }
+      )
     }
   }
+
 
   val apps: HttpApp[Any] =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
