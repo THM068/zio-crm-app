@@ -1,5 +1,6 @@
 @import zio.Chunk
-@(errors: Chunk[String])
+@import com.crm.server.routes.LoginDTO
+@(errors: Chunk[String], loginDTO: LoginDTO)
 <div class="alert alert-danger">
   <ul>
     @for(msg <- errors){
@@ -11,7 +12,7 @@
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
     <input type="email" name="email" class="form-control" id="exampleInputEmail1"
-    aria-describedby="emailHelp" placeholder="Enter email">
+    aria-describedby="emailHelp" placeholder="Enter email" value="@{loginDTO.email}">
     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
   </div>
   <div class="form-group">

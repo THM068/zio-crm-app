@@ -157,13 +157,14 @@ class ExampleRoutes {
   val login = Method.POST / "login"  -> handler { (request: Request) =>
     for {
       formPayLoad <- request.body.asURLEncodedForm
+      loginDTO = new LoginDTO()
       validation =  validateLogin(formPayLoad.get("email"),
-                                  formPayLoad.get("password"))
+                                  formPayLoad.get("password"), loginDTO)
     } yield validation match {
       case Success(log, value) =>
         Response.text("Form entries are valid")
       case Validation.Failure(log, errors) =>
-        val content = examples.snippets.html.validatedform(errors)
+        val content = examples.snippets.html.validatedform(errors, loginDTO)
         render(content.body)
     }
   }
@@ -193,12 +194,17 @@ object ExampleRoutes {
 
 
 case class Login(email: String, password: String)
+class LoginDTO {
+  var email: String = ""
+}
 
 object LoginValidation {
-  def validateEmail(emailField: Option[FormField]): Validation[String, String] = emailField match {
+  def validateEmail(emailField: Option[FormField], loginDTO: LoginDTO): Validation[String, String] = emailField
+  match {
     case Some(emailFormField) =>
       emailFormField.stringValue match {
         case Some(value) =>
+          loginDTO.email = value
           if (value.isEmpty) Validation.fail("Email is empty")
           else if(!value.contains("@"))
             Validation.fail("This is not a valid email")
@@ -219,7 +225,8 @@ object LoginValidation {
         }
       case _ => Validation.fail("Please enter an password field")
     }
-  def validateLogin(email: Option[FormField], password: Option[FormField]): Validation[String, Login] =
-    Validation.validateWith(validateEmail(email), validatePassword(password))(Login)
+  def validateLogin(email: Option[FormField], password: Option[FormField], loginDTO: LoginDTO)
+  : Validation[String, Login] =
+    Validation.validateWith(validateEmail(email, loginDTO), validatePassword(password))(Login)
 
 }
