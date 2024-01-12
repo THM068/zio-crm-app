@@ -6,7 +6,7 @@ import com.crm.server.routes.LoginValidation.validateLogin
 import com.crm.services.ContactService
 import zio.{ZIO, ZLayer}
 import zio.http.endpoint.EndpointNotFound
-import zio.http.{HttpApp, Method, Request, Response, Route, RoutePattern, Routes, Status, handler, string}
+import zio.http.{FormField, HttpApp, Method, Request, Response, Route, RoutePattern, Routes, Status, handler, string}
 import zio.prelude.ZValidation.Success
 
 import java.util.UUID
@@ -157,24 +157,12 @@ class ExampleRoutes {
   val login = Method.POST / "login"  -> handler { (request: Request) =>
     for {
       formPayLoad <- request.body.asURLEncodedForm
-      validation =  (formPayLoad.get("email"), formPayLoad.get("password")) match {
-        case (Some(email), Some(password)) =>
-          validateLogin(email.stringValue.getOrElse(""), password.stringValue.getOrElse(""))
-        case (None,Some(password)) =>
-          validateLogin("",password.stringValue.getOrElse(""))
-        case (Some(email),None) =>
-          validateLogin(email.stringValue.getOrElse(""),"")
-        case (None, None)  =>
-          validateLogin("","")
-      }
-
-
+      validation =  validateLogin(formPayLoad.get("email"),
+                                  formPayLoad.get("password"))
     } yield validation match {
       case Success(log, value) =>
         Response.text("Form entries are valid")
       case Validation.Failure(log, errors) =>
-         println(errors.toString())
-         println(log)
         val content = examples.snippets.html.validatedform(errors)
         render(content.body)
     }
@@ -207,17 +195,31 @@ object ExampleRoutes {
 case class Login(email: String, password: String)
 
 object LoginValidation {
-  def validateEmail(email: String): Validation[String, String] =
-    if (email.isEmpty) Validation.fail("Email is empty")
-    else if(!email.contains("@"))
-      Validation.fail("This is not a valid email")
-    else Validation.succeed(email)
+  def validateEmail(emailField: Option[FormField]): Validation[String, String] = emailField match {
+    case Some(emailFormField) =>
+      emailFormField.stringValue match {
+        case Some(value) =>
+          if (value.isEmpty) Validation.fail("Email is empty")
+          else if(!value.contains("@"))
+            Validation.fail("This is not a valid email")
+          else Validation.succeed(value)
+        case _ =>  Validation.fail("Please email field is blank")
+      }
+    case _ =>   Validation.fail("Please enter an email field")
+  }
+  def validatePassword(passwordField: Option[FormField]): Validation[String, String] =
+    passwordField match {
+      case Some(passwordFormField) =>
+        passwordFormField.stringValue match {
+          case Some(value) =>
+            if (value.isEmpty) Validation.fail(s"Password is empty")
+            else Validation.succeed(value)
+          case _ => Validation.fail("Please password field is blank")
 
-  def validatePassword(password: String): Validation[String, String] =
-    if (password.isEmpty) Validation.fail(s"Password is empty")
-    else Validation.succeed(password)
-
-  def validateLogin(email: String, password: String): Validation[String, Login] =
+        }
+      case _ => Validation.fail("Please enter an password field")
+    }
+  def validateLogin(email: Option[FormField], password: Option[FormField]): Validation[String, Login] =
     Validation.validateWith(validateEmail(email), validatePassword(password))(Login)
 
 }
