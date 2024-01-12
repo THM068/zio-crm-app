@@ -1,11 +1,13 @@
 package com.crm.server.routes
-
+import zio.prelude.Validation
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
+import com.crm.server.routes.LoginValidation.validateLogin
 import com.crm.services.ContactService
 import zio.{ZIO, ZLayer}
 import zio.http.endpoint.EndpointNotFound
 import zio.http.{HttpApp, Method, Request, Response, Route, RoutePattern, Routes, Status, handler, string}
+import zio.prelude.ZValidation.Success
 
 import java.util.UUID
 
@@ -138,12 +140,51 @@ class ExampleRoutes {
         ViewRenderer.render("")
     }
 
+
+
+  } //validate-multiple-fields
+
+  val validateMultiplefields = Method.GET / "validate-multiple-fields"  -> handler {
+    val content = examples.html.validatemultiplefields()
+    render(content.body)
+  }
+
+  val loadValidateMultipleFields = Method.GET / "load-validate-multiple-rows" -> handler {
+    val content = examples.snippets.html.loadmultiplefields()
+    render(content.body)
+  }
+
+  val login = Method.POST / "login"  -> handler { (request: Request) =>
+    for {
+      formPayLoad <- request.body.asURLEncodedForm
+      validation =  (formPayLoad.get("email"), formPayLoad.get("password")) match {
+        case (Some(email), Some(password)) =>
+          validateLogin(email.stringValue.getOrElse(""), password.stringValue.getOrElse(""))
+        case (None,Some(password)) =>
+          validateLogin("",password.stringValue.getOrElse(""))
+        case (Some(email),None) =>
+          validateLogin(email.stringValue.getOrElse(""),"")
+        case (None, None)  =>
+          validateLogin("","")
+      }
+
+
+    } yield validation match {
+      case Success(log, value) =>
+        Response.text("Form entries are valid")
+      case Validation.Failure(log, errors) =>
+         println(errors.toString())
+         println(log)
+        val content = examples.snippets.html.validatedform(errors)
+        render(content.body)
+    }
   }
 
   val apps: HttpApp[Any] =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
-      loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact, getContactRow)
+      loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact,
+      getContactRow, validateMultiplefields, loadValidateMultipleFields, login)
       .handleError { t: Throwable =>
         if(t.isInstanceOf[EndpointNotFound])
           Response.text("Not found")
@@ -159,5 +200,24 @@ object ExampleRoutes {
   val layer: ZLayer[Any, Nothing, ExampleRoutes] = ZLayer.succeed(apply)
 
   def apply = new ExampleRoutes()
+
+}
+
+
+case class Login(email: String, password: String)
+
+object LoginValidation {
+  def validateEmail(email: String): Validation[String, String] =
+    if (email.isEmpty) Validation.fail("Email is empty")
+    else if(!email.contains("@"))
+      Validation.fail("This is not a valid email")
+    else Validation.succeed(email)
+
+  def validatePassword(password: String): Validation[String, String] =
+    if (password.isEmpty) Validation.fail(s"Password is empty")
+    else Validation.succeed(password)
+
+  def validateLogin(email: String, password: String): Validation[String, Login] =
+    Validation.validateWith(validateEmail(email), validatePassword(password))(Login)
 
 }

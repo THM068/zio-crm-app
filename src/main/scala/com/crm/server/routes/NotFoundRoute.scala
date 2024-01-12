@@ -7,7 +7,7 @@ import zio.http.{HttpApp, Method, Response, RoutePattern, Routes, Status, handle
 class NotFoundRoute {
   val notFoundRoute = RoutePattern.any -> handler {
     val content = examples.html.notFound()
-    ViewRenderer.render(content.body)
+    ViewRenderer.render(content.body,Response.notFound.status)
   }
 
   val apps: HttpApp[Any] = Routes(notFoundRoute)
