@@ -1,13 +1,13 @@
 package com.crm.server.routes
-import zio.prelude.Validation
+import com.crm.model.ContactInfo
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.server.routes.LoginValidation.validateLogin
 import com.crm.services.ContactService
-import zio.{ZIO, ZLayer}
 import zio.http.endpoint.EndpointNotFound
-import zio.http.{FormField, HttpApp, Method, Request, Response, Route, RoutePattern, Routes, Status, handler, string}
-import zio.prelude.ZValidation.Success
+import zio.http.{FormField, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, handlerTODO, string}
+import zio.prelude.Validation
+import zio.{ZIO, ZLayer}
 
 import java.util.UUID
 
@@ -176,12 +176,41 @@ class ExampleRoutes {
     }
   }
 
+  val activeSearch = Method.GET / "active-search" -> handler {
+    val content = examples.html.activeSearch()
+    render(content.body)
+  }
+
+  val search = Method.POST / "search" -> handler { (request: Request) =>
+    for {
+      form <- request.body.asURLEncodedForm
+      search = form.get("search")
+      result = search match {
+        case Some(s) =>
+            s.stringValue match {
+              case Some(formField) =>
+                ContactInfo.contactList.filter(
+                  c => c.name.toLowerCase().contains(formField.toLowerCase()) ||
+                       c.surname.toLowerCase().contains(formField.toLowerCase())
+                )
+              case _ => List[ContactInfo]()
+            }
+        case _ => List[ContactInfo]()
+      }
+    } yield {
+      val content = examples.snippets.html.searchResults(result)
+      render(content.body)
+    }
+
+  }
+
 
   val apps: HttpApp[Any] =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
       loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact,
-      getContactRow, validateMultiplefields, loadValidateMultipleFields, login)
+      getContactRow, validateMultiplefields, loadValidateMultipleFields, login, activeSearch,
+      search)
       .handleError { t: Throwable =>
         if(t.isInstanceOf[EndpointNotFound])
           Response.text("Not found")
