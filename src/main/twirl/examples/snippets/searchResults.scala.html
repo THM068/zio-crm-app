@@ -1,0 +1,10 @@
+@import com.crm.model.ContactInfo
+@(contacts: List[ContactInfo])
+
+@for(contact <- contacts) {
+  <tr>
+    <td>@contact.name</td>
+    <td>@contact.surname</td>
+    <td>@contact.email</td>
+  </tr>
+}

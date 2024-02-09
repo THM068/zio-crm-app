@@ -1,7 +1,6 @@
 package com.crm.model
-import zio._
-import zio.http._
-import zio.json.{DecoderOps, DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder}
+
+import zio.json.{DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder}
 
 sealed trait AppError extends Exception
 
@@ -20,19 +19,24 @@ object Joke {
 sealed trait Status
 
 case object Active extends Status
+
 case object Inactive extends Status
+case class ContactInfo(name: String, surname: String, email: String)
 case class Contact(id: String, name: String, email: String, status: Status) {
   def toContactDTO =
-    ContactDTO(id, name, email, if(status == Active) "Active"
+    ContactDTO(id, name, email, if (status == Active) "Active"
     else "Inactive")
 }
+
 case class ContactDTO(id: String, name: String, email: String, status: String) {
   def toContact =
-    Contact(id = id, name = name, email = email, status = if(status == "Active") Active else Inactive )
+    Contact(id = id, name = name, email = email, status = if (status == "Active") Active else Inactive)
 }
 
 object ContactDb {
+
   import scala.collection.mutable.Map
+
   val contacts: Map[String, Contact] = Map[String, Contact](
     "1" -> Contact("1", "Joe Smith", "joe@smith.org", Active),
     "2" -> Contact("2", "Angie MacDowell", "angie@macdowell.org", Active),
@@ -62,3 +66,56 @@ object ContactDb {
 //  override val run = program.provide(Client.default, Scope.default)
 //
 //}
+
+
+object ContactInfo {
+  val input =
+    """"|Venus	Grimes	lectus.rutrum@Duisa.edu
+      |Fletcher	Owen	metus@Aenean.org
+      |William	Hale	eu.dolor@risusodio.edu
+      |TaShya	Cash	tincidunt.orci.quis@nuncnullavulputate.co.uk
+      |Kevyn	Hoover	tristique.pellentesque.tellus@Cumsociis.co.uk
+      |Jakeem	Walker	Morbi.vehicula.Pellentesque@faucibusorci.org
+      |Malcolm	Trujillo	sagittis@velit.edu
+      |Wynne	Rice	augue.id@felisorciadipiscing.edu
+      |Evangeline	Klein	adipiscing.lobortis@sem.org
+      |Jennifer	Russell	sapien.Aenean.massa@risus.com
+      |Rama	Freeman	Proin@quamPellentesquehabitant.net
+      |Jena	Mathis	non.cursus.non@Phaselluselit.com
+      |Alexandra	Maynard	porta.elit.a@anequeNullam.ca
+      |Tallulah	Haley	ligula@id.net
+      |Timon	Small	velit.Quisque.varius@gravidaPraesent.org
+      |Randall	Pena	facilisis@Donecconsectetuer.edu
+      |Conan	Vaughan	luctus.sit@Classaptenttaciti.edu
+      |Dora	Allen	est.arcu.ac@Vestibulumante.co.uk
+      |Aiko	Little	quam.dignissim@convallisest.net
+      |Jessamine	Bauer	taciti.sociosqu@nibhvulputatemauris.co.uk
+      |Gillian	Livingston	justo@atiaculisquis.com
+      |Laith	Nicholson	elit.pellentesque.a@diam.org
+      |Paloma	Alston	cursus@metus.org
+      |Freya	Dunn	Vestibulum.accumsan@metus.co.uk
+      |Griffin	Rice	justo@tortordictumeu.net
+      |Catherine	West	malesuada.augue@elementum.com
+      |Jena	Chambers	erat.Etiam.vestibulum@quamelementumat.net
+      |Neil	Rodriguez	enim@facilisis.com
+      |Freya	Charles	metus@nec.net
+      |Anastasia	Strong	sit@vitae.edu
+      |Bell	Simon	mollis.nec.cursus@disparturientmontes.ca
+      |Minerva	Allison	Donec@nequeIn.edu
+      |Yoko	Dawson	neque.sed@semper.net
+      |Nadine	Justice	netus@et.edu
+      |Hoyt	Rosa	Nullam.ut.nisi@Aliquam.co.uk
+      |Shafira	Noel	tincidunt.nunc@non.edu
+      |Jin	Nunez	porttitor.tellus.non@venenatisamagna.net
+      |Barbara	Gay	est.congue.a@elit.com
+      |Riley	Hammond	tempor.diam@sodalesnisi.net
+      |""".stripMargin
+
+  def contactList: List[ContactInfo] = {
+    input.split("\n")
+      .map(_.split("\\s"))
+      .map(f => ContactInfo(f(0).trim, f(1).trim, f(2).trim))
+      .toList
+
+  }
+}

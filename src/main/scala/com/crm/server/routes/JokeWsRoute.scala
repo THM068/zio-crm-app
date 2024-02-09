@@ -49,6 +49,7 @@ object JokeTickerBroadCaster {
 
   val clientsMap: Map[String, WebSocketChannel] = Map[String, WebSocketChannel]()
 
+
   def register(clientId: String, channel: WebSocketChannel) =
     clientsMap += (clientId -> channel)
 
