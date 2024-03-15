@@ -1,10 +1,10 @@
 package com.crm.middleware
 
 import com.crm.server.renderer.ViewRenderer
-import zio.Exit
-import zio.http.{Handler, HandlerAspect, Headers, Request, Response, Status}
+import zio._
+import zio.http.{Handler, HandlerAspect, Header, Headers, Request, Response, Status}
 
-object CustomMiddleware {
+object CustomMiddleware  {
 
   def customAuth(
                   verify: Request => Boolean,

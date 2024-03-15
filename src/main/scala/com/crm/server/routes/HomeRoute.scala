@@ -1,5 +1,6 @@
 package com.crm.server.routes
 import com.crm.server.renderer.ViewRenderer
+import com.crm.server.routes.middleware.CustomMiddleware.{cookieBearer}
 import zio._
 import zio.http._
 import html._
@@ -9,7 +10,7 @@ class HomeRoute() {
   val index = Method.GET / "" -> handler {
     val content = html.IndexPage(List("Apple", "Oranges", "Mangoes"), "Home")
     ViewRenderer.render(content.body)
-  }
+  } @@ cookieBearer
 
   val about = Method.GET / "about" -> handler {
     val content = html.about()

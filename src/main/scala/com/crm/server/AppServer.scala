@@ -2,14 +2,15 @@ package com.crm.server
 
 import com.crm.server.routes.{AssetRoutes, ExampleRoutes, HomeRoute, JokeWsRoute, NotFoundRoute}
 import zio._
-import zio.http.Server
+import zio.http.{Middleware, Path, Routes, Server}
 
 case class AppServer(homeRoute: HomeRoute, exampleRoutes: ExampleRoutes,
                      assetRoutes: AssetRoutes, jokeWsRoute: JokeWsRoute, notFound: NotFoundRoute) {
 
+  val serveResourcesApp = Routes.empty.toHttpApp @@  Middleware.serveResources(Path.empty /
+    "resources")
   //not found should be the last one in this apps concatenation
-  val apps = homeRoute.apps ++ assetRoutes.apps ++ exampleRoutes.apps ++ jokeWsRoute.apps ++
-    notFound.apps
+  val apps = homeRoute.apps ++ assetRoutes.apps ++ exampleRoutes.apps ++ jokeWsRoute.apps ++ serveResourcesApp ++ notFound.apps
   val port = 9999
 
   def runServer(): ZIO[Any, Throwable, Unit] = for {

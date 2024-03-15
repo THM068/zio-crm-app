@@ -4,7 +4,7 @@ import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.server.routes.LoginValidation.validateLogin
 import com.crm.services.ContactService
-import zio.http.endpoint.EndpointNotFound
+import zio.http.endpoint.{Endpoint, EndpointNotFound}
 import zio.http.{FormField, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, handlerTODO, string}
 import zio.prelude.Validation
 import zio.{ZIO, ZLayer}
@@ -15,7 +15,7 @@ class ExampleRoutes {
 
   val notFound = RoutePattern.any
 
-  val clickToEdit = Method.GET / "click-to-edit" -> handler {
+  val clickToEdit = Method.GET / "click-to-edit" -> handler { (request: Request) =>
     val content = examples.html.clickToEdit()
     render(content.body)
   }
@@ -204,13 +204,18 @@ class ExampleRoutes {
 
   }
 
+  val jwt_as_cookie_page = Method.GET / "jwt-cookie" -> handler {
+    val content = examples.html.jwtAsCookie()
+    render(content.body)
+  }
+
 
   val apps: HttpApp[Any] =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
       loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact,
       getContactRow, validateMultiplefields, loadValidateMultipleFields, login, activeSearch,
-      search)
+      search, jwt_as_cookie_page)
       .handleError { t: Throwable =>
         if(t.isInstanceOf[EndpointNotFound])
           Response.text("Not found")
