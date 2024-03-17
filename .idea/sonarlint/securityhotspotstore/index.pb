@@ -110,3 +110,5 @@ o
 ?src/main/scala/com/crm/server/routes/middleware/Middleware.java,3/4/3453afadcde96b1d43cec50b0f006e4efd75ee09
 v
 Fsrc/main/scala/com/crm/server/routes/middleware/CustomMiddleware.scala,2/7/27b83c3a038444ec121b2e9bf357cf8d9e736f50
+e
+5src/main/scala/com/crm/server/routes/LoginRoute.scala,5/2/529253c423807813e5cfd1990197daa5a9ff8b5e
