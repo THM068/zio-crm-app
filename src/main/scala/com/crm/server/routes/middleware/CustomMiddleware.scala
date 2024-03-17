@@ -22,6 +22,13 @@ object CustomMiddleware {
         }
       }
     }
+
+  def hxTrigger(event: String):HandlerAspect[Any, Unit] =
+    Middleware.interceptOutgoingHandler {
+      Handler.fromFunction[Response] { response =>
+        response.addHeader("HX-Trigger", event)
+      }
+    }
   def cookieBearer(): HandlerAspect[Any, Unit] =
     Middleware.interceptIncomingHandler {
       Handler.fromFunctionExit[Request] { request =>

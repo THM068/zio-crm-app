@@ -3,7 +3,7 @@ import com.crm.model.ContactInfo
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.server.routes.LoginValidation.validateLogin
-import com.crm.server.routes.middleware.CustomMiddleware.hxRequest
+import com.crm.server.routes.middleware.CustomMiddleware.{hxRequest, hxTrigger}
 import com.crm.services.ContactService
 import zio.http.endpoint.{Endpoint, EndpointNotFound}
 import zio.http.{FormField, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, handlerTODO, string}
@@ -104,7 +104,7 @@ class ExampleRoutes {
   val loadEditRows = Method.GET / "load-edit-rows" -> handler {
     val content = examples.snippets.html.loadeditrows(ContactService.contacts())
     render(content.body)
-  } @@ hxRequest()
+  } @@ hxRequest() @@ hxTrigger("custom-event")
 
   val getContactByIdForm = Method.GET / "contact" / string("id") / "edit" -> handler { (id: String,
                                                                                         _: Request) =>
