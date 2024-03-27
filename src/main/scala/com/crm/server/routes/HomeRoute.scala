@@ -10,12 +10,12 @@ class HomeRoute() {
   val index = Method.GET / "" -> handler {
     val content = html.IndexPage(List("Apple", "Oranges", "Mangoes"), "Home")
     ViewRenderer.render(content.body)
-  } @@ cookieBearer
+  }
 
   val about = Method.GET / "about" -> handler {
     val content = html.about()
     ViewRenderer.render(content.body)
-  }
+  } @@ cookieBearer
 
   val contact = Method.GET / "contact" -> handler {
     val content = html.contact()

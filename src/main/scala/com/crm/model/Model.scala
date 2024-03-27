@@ -119,3 +119,34 @@ object ContactInfo {
 
   }
 }
+
+case class Todo(name: String, status: Boolean)
+
+object TodoStore {
+  import scala.collection.mutable.ListBuffer;
+
+  val todos: ListBuffer[Todo] = ListBuffer[Todo](
+    Todo("Buy Milk",status = false),
+    Todo("Buy Bread", status = false),
+    Todo("Buy Eggs", status = false),
+    Todo("Buy Butter", status = false)
+  )
+
+  def add(todo: Todo): Unit = {
+    todos.append(todo)
+  }
+
+  def changeStatus(todo: Todo): Unit = {
+    todos.indexOf(todo) match {
+      case -1 => println("Todo not found")
+      case i => todos(i) = todo.copy(status = !todo.status)
+    }
+  }
+
+  def remove(todo: Todo): Unit = {
+    todos.indexOf(todo) match {
+      case -1 => println("Todo not found")
+      case i => todos.remove(i)
+    }
+  }
+}

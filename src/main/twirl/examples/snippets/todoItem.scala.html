@@ -1,0 +1,8 @@
+@import com.crm.model.Todo
+@(todo: Todo, todoCount: Int)
+
+<li>@{todo.name}</li>
+
+<div id="todo-count" hx-swap-oob="true">
+  item count: @todoCount
+</div>

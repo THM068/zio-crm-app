@@ -1,18 +1,41 @@
 package com.crm.server.routes
-import com.crm.model.ContactInfo
+import com.crm.model.{ContactInfo, Todo, TodoStore}
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.server.routes.LoginValidation.validateLogin
-import com.crm.server.routes.middleware.CustomMiddleware.{hxRequest, hxTrigger}
+import com.crm.server.routes.middleware.CustomMiddleware.{cookieBearer, hxRequest, hxTrigger}
 import com.crm.services.ContactService
+import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
+import zio.http.Cookie
 import zio.http.endpoint.{Endpoint, EndpointNotFound}
-import zio.http.{FormField, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, handlerTODO, string}
+import zio.http.{Cookie, FormField, Header, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, handlerTODO, string}
 import zio.prelude.Validation
-import zio.{ZIO, ZLayer}
+import zio.{Chunk, ZIO, ZLayer}
 
+import java.time.Clock
 import java.util.UUID
+import scala.collection.immutable.Seq
 
 class ExampleRoutes {
+
+  // Secret Authentication key
+  val SECRET_KEY = "secretKey"
+
+  implicit val clock: Clock = Clock.systemUTC
+
+  // Helper to encode the JWT token
+  def jwtEncode(username: String): String = {
+    val json  = s"""{"user": "${username}"}"""
+    val claim = JwtClaim {
+      json
+    }.issuedNow.expiresIn(300)
+    Jwt.encode(claim, SECRET_KEY, JwtAlgorithm.HS512)
+  }
+
+  // Helper to decode the JWT token
+  def jwtDecode(token: String): Option[JwtClaim] = {
+    Jwt.decode(token, "secretKey", Seq(JwtAlgorithm.HS512)).toOption
+  }
 
   val notFound = RoutePattern.any
 
@@ -66,6 +89,21 @@ class ExampleRoutes {
     }
   }
 
+  val add_todo = Method.POST / "add-todo" -> handler { (request: Request) =>
+    for {
+      payloadForm <- request.body.asURLEncodedForm
+      todo = payloadForm.get("name") match {
+        case Some(formfield) => formfield.stringValue.getOrElse("")
+        case _ => ""
+      }
+      newTodo = Todo(todo, false)
+      _ = TodoStore.add(newTodo)
+    } yield {
+      val content = examples.snippets.html.todoItem(newTodo, TodoStore.todos.length)
+      render(content.body)
+    }
+  }
+
   val deActivateContact = Method.PUT / "deactivate" -> handler { (request: Request) =>
     for {
       payloadForm <- request.body.asURLEncodedForm
@@ -104,7 +142,7 @@ class ExampleRoutes {
   val loadEditRows = Method.GET / "load-edit-rows" -> handler {
     val content = examples.snippets.html.loadeditrows(ContactService.contacts())
     render(content.body)
-  } @@ hxRequest() @@ hxTrigger("custom-event")
+  } @@ hxRequest()  @@ cookieBearer() // hxTrigger("custom-event")
 
   val getContactByIdForm = Method.GET / "contact" / string("id") / "edit" -> handler { (id: String,
                                                                                         _: Request) =>
@@ -170,8 +208,19 @@ class ExampleRoutes {
           val content = examples.snippets.html.validatedform(failure, loginDTO)
           ZIO.succeed(render(content.body))
         },
-        success => {
-          ZIO.succeed(Response.text(s"Form entries are valid ${success}"))
+        login => {
+          if(login.email == "username@email.com" && login.password == "password") {
+            val jwt = jwtEncode(login.email)
+            val cookie = Cookie.Response("jwt", jwt)
+
+            //.addHeader("HX-Refresh", "true")
+            ZIO.succeed(Response.text(s"***Form entries are valid ${login}").addCookie(cookie))
+          }
+          else{
+            val content = examples.snippets.html.validatedform(Chunk("Incorrect username or " +
+              "password"), loginDTO)
+            ZIO.succeed(render(content.body))
+          }
         }
       )
     }
@@ -210,13 +259,18 @@ class ExampleRoutes {
     render(content.body)
   }
 
+  val oob_example_page = Method.GET / "oob-todo-example" -> handler {
+    val content = examples.html.oobExample(TodoStore.todos)
+    render(content.body)
+  }
+
 
   val apps: HttpApp[Any] =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
       loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact,
       getContactRow, validateMultiplefields, loadValidateMultipleFields, login, activeSearch,
-      search, jwt_as_cookie_page)
+      search, jwt_as_cookie_page, oob_example_page, add_todo)
       .handleError { t: Throwable =>
         if(t.isInstanceOf[EndpointNotFound])
           Response.text("Not found")

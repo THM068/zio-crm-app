@@ -1,0 +1,23 @@
+@import html.main
+@import scala.collection.mutable.ListBuffer
+@import com.crm.model.Todo
+@(todoList: ListBuffer[Todo],name: String = "OOB Example")
+
+
+@main(name) {
+  <h3>OOB example</h3>
+  <div id="todo-count" >
+      item count: @todoList.size
+  </div>
+  <div>
+    <form hx-post="/add-todo" hx-swap="beforeend" hx-target="#todo-list">
+      <input type="text" name="name" />
+      <input type="submit" value="Add" />
+    </form>
+  </div>
+  <ul id="todo-list">
+    @for(todo <- todoList) {
+      <li>@{todo.name}</li>
+    }
+  </ul>
+}
