@@ -12,7 +12,6 @@ object CustomMiddleware {
        val hxRequestHeader = Header.Custom("HX-Request", "true")
         request.header(hxRequestHeader.headerType) match {
           case Some(headerValue) =>
-            Console.println(s"Headervalue: ${headerValue.value}")
             Exit.succeed(request -> ())
           case None =>
             Exit.fail(Response.text("Content cannot be viewed via this method")

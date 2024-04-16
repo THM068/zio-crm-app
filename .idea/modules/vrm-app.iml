@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id="root [file:/Users/tma24/private_projects/vrm-app/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
-  <component name="Go" enabled="true" />
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_21">
     <output url="file://$MODULE_DIR$/../../target/scala-2.12/classes" />
     <output-test url="file://$MODULE_DIR$/../../target/scala-2.12/test-classes" />
@@ -93,13 +92,9 @@
         <CLASSES />
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/incubator/netty-incubator-transport-native-io_uring/0.0.20.Final/netty-incubator-transport-native-io_uring-0.0.20.Final-sources.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/incubator/netty-incubator-transport-native-io_uring/0.0.24.Final/netty-incubator-transport-native-io_uring-0.0.24.Final-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
-  </component>
-  <component name="SonarLintModuleSettings">
-    <option name="uniqueId" value="cff5b3e6-a0fb-429b-bebd-bbe7207fd8ef" />
   </component>
 </module>

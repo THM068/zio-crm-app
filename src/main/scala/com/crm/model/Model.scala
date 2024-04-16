@@ -2,6 +2,11 @@ package com.crm.model
 
 import zio.json.{DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder}
 
+import java.time.temporal.WeekFields
+import java.time.{Duration, LocalDate}
+import java.util.Locale
+import scala.collection.compat.immutable.LazyList
+
 sealed trait AppError extends Exception
 
 object AppError {
@@ -150,3 +155,35 @@ object TodoStore {
     }
   }
 }
+
+object DateFormater {
+
+  import java.time.format.DateTimeFormatter
+  import java.time.LocalDateTime
+
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM")
+
+  def format(date: LocalDateTime): String =
+    date.format(formatter)
+
+  def parse(date: String): LocalDateTime =
+    LocalDateTime.parse(date, formatter)
+
+  def toLocalDate(date: String): LocalDate =
+    LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+}
+
+object LocalDateUtil {
+  def  getDaysOfCurrentWeek(locale :Locale): List[LocalDate] = {
+    val now = LocalDate.now()
+    val firstDayOfWeek = WeekFields.of(locale).getFirstDayOfWeek()
+    val firstDay = now.`with`(firstDayOfWeek)
+    LazyList
+      .iterate(firstDay)(_.plusDays(1)).take(7).toList
+
+  }
+}
+
+case class Project(id: Int, name: String)
+
+case class TimeRegistration(projectId: Int, date: LocalDate, duration: Duration)

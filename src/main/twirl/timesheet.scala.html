@@ -1,0 +1,53 @@
+@import html.tailwindMain
+@import com.crm.model.Project
+@import java.time.LocalDate
+
+@(projects:List[Project], days: List[LocalDate], title: String = "Home")
+
+@tailwindMain(title) {
+  <div  class="container mx-auto max-w-2xl my-4">
+    <div class="flex justify-between mb-4">
+      <h1 class="text-3xl">Timesheets</h1>
+      <div>
+        <div class="text-sm text-gray-400 uppercase">Total</div>
+        <div id="overall-total" class="text-2xl">0</div>
+      </div>
+    </div>
+    <div>
+      <div class="grid grid-cols-9 mb-2 gap-x-2">
+        <div class="font-bold col-span-2">Projects</div>
+
+        @for(day <- days) {
+          <div class="flex justify-center">
+            <div>@{day.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM"))}</div>
+          </div>
+        }
+        </div>
+       <div class="grid grid-cols-9 mb-2 gap-x-2">
+        @for(project <- projects) {
+          <div class="flex items-centercol-span-2">@project.name</div>
+          <br/>
+          <br/>
+            @for(day <- days) {
+              <div>
+                <input type="text" class="w-full border-2" name="value" style="border-color: gray"
+                hx-put="/projects/@{project.id}/@{day}"
+                hx-trigger="keyup changed delay:500ms">
+              </div>
+            }
+        }
+        </div>
+     <div class="grid grid-cols-9 mb-2 gap-x-2">
+       <div class="col-span-2"></div>
+       @for(day <- days) {
+         <div class="flex justify-center">
+           <div id="dayTotal_@{day.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"))}" class="text-lg">
+            PT0
+           </div>
+         </div>
+       }
+     </div>
+    </div>
+
+  </div>
+}

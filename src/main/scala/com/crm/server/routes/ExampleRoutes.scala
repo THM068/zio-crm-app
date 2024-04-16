@@ -1,20 +1,21 @@
 package com.crm.server.routes
+import com.crm.model.DateFormater.toLocalDate
+import com.crm.model.LocalDateUtil.getDaysOfCurrentWeek
 import com.crm.model.{ContactInfo, Todo, TodoStore}
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.server.routes.LoginValidation.validateLogin
-import com.crm.server.routes.middleware.CustomMiddleware.{cookieBearer, hxRequest, hxTrigger}
-import com.crm.services.ContactService
+import com.crm.server.routes.middleware.CustomMiddleware.{cookieBearer, hxRequest}
+import com.crm.services.{ContactService, ProjectService, TimeRegistrationService}
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
-import zio.http.Cookie
-import zio.http.endpoint.{Endpoint, EndpointNotFound}
-import zio.http.{Cookie, FormField, Header, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, handlerTODO, string}
+import zio.http.endpoint.EndpointNotFound
+import zio.http.{Cookie, FormField, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, int, string}
 import zio.prelude.Validation
 import zio.{Chunk, ZIO, ZLayer}
 
-import java.time.Clock
-import java.util.UUID
-import scala.collection.immutable.Seq
+import java.time.format.DateTimeFormatter
+import java.time.{Clock, Duration}
+import java.util.{Locale, UUID}
 
 class ExampleRoutes {
 
@@ -264,13 +265,40 @@ class ExampleRoutes {
     render(content.body)
   }
 
+  val timeSheet = Method.GET / "timesheet" -> handler {
+    val daysOfCurrentWeek = getDaysOfCurrentWeek(Locale.ENGLISH)
+    println(daysOfCurrentWeek)
+    val content = html.timesheet(projects = ProjectService.getProjects, daysOfCurrentWeek)
+    render(content.body)
+  }
+
+  val updateTimesheet = Method.PUT / "projects" / int("projectId") / string("date") -> handler { ( projectId: Int, date: String, request: Request) =>
+    val localDate = toLocalDate(date)
+
+    for {
+      payloadForm <- request.body.asURLEncodedForm
+      value = payloadForm.get("value").flatMap(_.stringValue).map(_.toLong).getOrElse(0L)
+      duration = if(value == 0) Duration.ZERO else  java.time.Duration.ofMinutes((value * 60.0).toLong)
+      _ = TimeRegistrationService.addOrUpdateRegistration(projectId, localDate, duration)
+      total = TimeRegistrationService.getTotal(ProjectService.getProjectIds, getDaysOfCurrentWeek(Locale.ENGLISH).toSet)
+    } yield {
+      val dateSuffix = localDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+      val content=  examples.snippets.html.projectTotals(total, Map(
+        s"dayTotal_${dateSuffix}" -> TimeRegistrationService.getTotal(ProjectService.getProjectIds, Set(localDate))
+      ))
+      render(content.body)
+    }
+
+
+  }
+
 
   val apps: HttpApp[Any] =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
       loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact,
       getContactRow, validateMultiplefields, loadValidateMultipleFields, login, activeSearch,
-      search, jwt_as_cookie_page, oob_example_page, add_todo)
+      search, jwt_as_cookie_page, oob_example_page, add_todo, timeSheet, updateTimesheet)
       .handleError { t: Throwable =>
         if(t.isInstanceOf[EndpointNotFound])
           Response.text("Not found")

@@ -1,0 +1,13 @@
+@import java.time.Duration
+@(total: Duration, dayTotalMap: Map[String, Duration])
+
+<div id="overall-total" class="text-2xl" hx-swap-oob="true">@{
+    total
+}</div>
+
+<div id="@{
+    dayTotalMap.keys.last
+}" class="text-lg" hx-swap-oob="true">
+    @{dayTotalMap.values.last}
+</div>
+
