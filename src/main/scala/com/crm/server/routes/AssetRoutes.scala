@@ -10,10 +10,9 @@ class AssetRoutes {
   private val jsList = List("/htmx.min.js", "alpine.min.js", "tailwind.js", "htmx-ws.js",
     "hyperscript.min.js")
 
-  val apps: HttpApp[Any] = Routes.fromIterable(cssRoutes() ++ jsRoutes())
+  val apps = Routes.fromIterable(cssRoutes() ++ jsRoutes())
     .handleError(handle)
     .sandbox
-    .toHttpApp
 
   def handle(throwable: Throwable) = {
     Response.text("The error is " + throwable).status(Status.InternalServerError)

@@ -4,8 +4,7 @@ import com.crm.services.JokeService
 import zio._
 import zio.http.ChannelEvent.{Read, Unregistered, UserEvent, UserEventTriggered}
 import zio.http.codec.PathCodec.string
-import zio.http.{Handler, HttpApp, Method, Request, Response, Routes, WebSocketApp, WebSocketChannel, WebSocketFrame, handler}
-import zio.json.EncoderOps
+import zio.http.{Handler, Method, Request, Routes, WebSocketApp, WebSocketChannel, WebSocketFrame, handler}
 
 class JokeWsRoute {
 
@@ -29,12 +28,12 @@ class JokeWsRoute {
       }
     }
 
-  val apps: HttpApp[Any] =
+  val apps =
     Routes(
       Method.GET / "joke-subscription" / string("id") -> handler { (id: String, _: Request) =>
         socketApp(id).toResponse
       }
-    ).toHttpApp
+    )
 
 }
 

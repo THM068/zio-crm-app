@@ -6,26 +6,7 @@ import zio.http.{Handler, HandlerAspect, Header, Middleware, Request, Response};
 
 object CustomMiddleware {
 
-  def hxRequest(): HandlerAspect[Any, Unit] =
-    Middleware.interceptIncomingHandler {
-      Handler.fromFunctionExit[Request] { request =>
-       val hxRequestHeader = Header.Custom("HX-Request", "true")
-        request.header(hxRequestHeader.headerType) match {
-          case Some(headerValue) =>
-            Exit.succeed(request -> ())
-          case None =>
-            Exit.fail(Response.text("Content cannot be viewed via this method")
-            )
-        }
-      }
-    }
 
-  def hxTrigger(event: String):HandlerAspect[Any, Unit] =
-    Middleware.interceptOutgoingHandler {
-      Handler.fromFunction[Response] { response =>
-        response.addHeader("HX-Trigger", event)
-      }
-    }
   def cookieBearer(): HandlerAspect[Any, Unit] =
     Middleware.interceptIncomingHandler {
       Handler.fromFunctionExit[Request] { request =>

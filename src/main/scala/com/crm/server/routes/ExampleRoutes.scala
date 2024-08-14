@@ -1,15 +1,17 @@
 package com.crm.server.routes
+import com.crm.middleware.HtmxMiddleware.hxRequest
 import com.crm.model.DateFormater.toLocalDate
 import com.crm.model.LocalDateUtil.getDaysOfCurrentWeek
-import com.crm.model.{ContactInfo, Todo, TodoStore}
+import com.crm.model.{CarModelStore, ContactInfo, Todo, TodoStore}
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.server.routes.LoginValidation.validateLogin
-import com.crm.server.routes.middleware.CustomMiddleware.{cookieBearer, hxRequest}
+import com.crm.server.routes.middleware.CustomMiddleware.{cookieBearer}
 import com.crm.services.{ContactService, ProjectService, TimeRegistrationService}
+import examples.snippets.html._
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import zio.http.endpoint.EndpointNotFound
-import zio.http.{Cookie, FormField, HttpApp, Method, Request, Response, RoutePattern, Routes, Status, handler, int, string}
+import zio.http.{Cookie, FormField, Method, Request, Response, RoutePattern, Routes, Status, handler, int, string}
 import zio.prelude.Validation
 import zio.{Chunk, ZIO, ZLayer}
 
@@ -46,17 +48,17 @@ class ExampleRoutes {
   }
 
   val contactForm = Method.GET / "contact-form" -> handler {
-    val content = examples.snippets.html.contact()
+    val content = contact()
     render(content.body)
   }
 
   val contactFormPut = Method.PUT / "contact-form" -> handler {
-    val content = examples.snippets.html.contact()
+    val content = contact()
     render(content.body)
   }
 
   val editContactForm = Method.GET / "edit-contact-from" -> handler {
-    val content = examples.snippets.html.editcontact()
+    val content = editcontact()
     render(content.body)
   }
 
@@ -71,7 +73,7 @@ class ExampleRoutes {
     render(content.body)
   }
   val loadBulkContacts = Method.GET / "load-bulk-contacts" -> handler {
-    val content = examples.snippets.html.loadbulkcontacts(ContactService.contacts())
+    val content = loadbulkcontacts(ContactService.contacts())
     render(content.body)
   }
 
@@ -85,7 +87,7 @@ class ExampleRoutes {
       idList = idsString.split(",").toList
       list = ContactService.activatefor(idList)
     } yield {
-      val content = examples.snippets.html.contactlistbody(list, idList, "activate")
+      val content = contactlistbody(list, idList, "activate")
       render(content.body)
     }
   }
@@ -100,7 +102,7 @@ class ExampleRoutes {
       newTodo = Todo(todo, false)
       _ = TodoStore.add(newTodo)
     } yield {
-      val content = examples.snippets.html.todoItem(newTodo, TodoStore.todos.length)
+      val content = todoItem(newTodo, TodoStore.todos.length)
       render(content.body)
     }
   }
@@ -115,7 +117,7 @@ class ExampleRoutes {
       idList = idsString.split(",").toList
       list = ContactService.deActivatefor(idList)
     } yield {
-      val content = examples.snippets.html.contactlistbody(list, idList, "deactivate")
+      val content = contactlistbody(list, idList, "deactivate")
       render(content.body)
     }
   }
@@ -126,7 +128,7 @@ class ExampleRoutes {
   }
 
   val loadDeleteRows = Method.GET / "load-delete-rows" -> handler {
-    val content = examples.snippets.html.loaddeleterows(ContactService.contacts())
+    val content = loaddeleterows(ContactService.contacts())
     render(content.body)
   }
 
@@ -141,14 +143,14 @@ class ExampleRoutes {
   } //
 
   val loadEditRows = Method.GET / "load-edit-rows" -> handler {
-    val content = examples.snippets.html.loadeditrows(ContactService.contacts())
+    val content = loadeditrows(ContactService.contacts())
     render(content.body)
-  } @@ hxRequest()  @@ cookieBearer() // hxTrigger("custom-event")
+  } @@ hxRequest()   // hxTrigger("custom-event")
 
   val getContactByIdForm = Method.GET / "contact" / string("id") / "edit" -> handler { (id: String,
                                                                                         _: Request) =>
     val contact = ContactService.getContact(id).get
-    val content = examples.snippets.html.editcontactform(contact)
+    val content = editcontactform(contact)
     render(content.body)
   }
 
@@ -164,7 +166,7 @@ class ExampleRoutes {
           ContactService.updateContact(contact).toContactDTO
       }
     } yield {
-      val content = examples.snippets.html.updaterow(contactDTO)
+      val content = updaterow(contactDTO)
       ViewRenderer.render(content.body)
     }
   }
@@ -174,7 +176,7 @@ class ExampleRoutes {
     val contactDTO = ContactService.getContact(id)
     contactDTO match {
       case Some(c) =>
-        val content = examples.snippets.html.updaterow(c)
+        val content = updaterow(c)
         ViewRenderer.render(content.body)
       case _ =>
         ViewRenderer.render("")
@@ -190,7 +192,7 @@ class ExampleRoutes {
   }
 
   val loadValidateMultipleFields = Method.GET / "load-validate-multiple-rows" -> handler {
-    val content = examples.snippets.html.loadmultiplefields()
+    val content = loadmultiplefields()
     render(content.body)
   }
 
@@ -206,7 +208,7 @@ class ExampleRoutes {
 
       validation.fold (
         failure =>{
-          val content = examples.snippets.html.validatedform(failure, loginDTO)
+          val content = validatedform(failure, loginDTO)
           ZIO.succeed(render(content.body))
         },
         login => {
@@ -218,7 +220,7 @@ class ExampleRoutes {
             ZIO.succeed(Response.text(s"***Form entries are valid ${login}").addCookie(cookie))
           }
           else{
-            val content = examples.snippets.html.validatedform(Chunk("Incorrect username or " +
+            val content = validatedform(Chunk("Incorrect username or " +
               "password"), loginDTO)
             ZIO.succeed(render(content.body))
           }
@@ -249,7 +251,7 @@ class ExampleRoutes {
         case _ => List[ContactInfo]()
       }
     } yield {
-      val content = examples.snippets.html.searchResults(result)
+      val content = searchResults(result)
       render(content.body)
     }
 
@@ -283,22 +285,36 @@ class ExampleRoutes {
       total = TimeRegistrationService.getTotal(ProjectService.getProjectIds, getDaysOfCurrentWeek(Locale.ENGLISH).toSet)
     } yield {
       val dateSuffix = localDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-      val content=  examples.snippets.html.projectTotals(total, Map(
+      val content=  projectTotals(total, Map(
         s"dayTotal_${dateSuffix}" -> TimeRegistrationService.getTotal(ProjectService.getProjectIds, Set(localDate))
       ))
       render(content.body)
     }
+  }
 
+  val cascading_selects = Method.GET / "cascading-selects" -> handler {
+    val content = examples.html.cascadingSelects()
+    render(content.body)
+  }
 
+  val getCarModels = Method.GET / "models" -> handler {(request: Request) =>
+    val make = request.url.queryParams.queryParam("make")
+    val carModels = make match {
+      case Some(c) => CarModelStore.getModel(c)
+      case _ => List()
+    }
+    val content = modelCarList(modelList = carModels)
+    render(content.body)
   }
 
 
-  val apps: HttpApp[Any] =
+  val apps =
     Routes(clickToEdit, contactForm, editContactForm, contactFormPut, websocketDadJokeExample,
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
       loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact,
       getContactRow, validateMultiplefields, loadValidateMultipleFields, login, activeSearch,
-      search, jwt_as_cookie_page, oob_example_page, add_todo, timeSheet, updateTimesheet)
+      search, jwt_as_cookie_page, oob_example_page, add_todo, timeSheet, updateTimesheet, cascading_selects,
+      getCarModels)
       .handleError { t: Throwable =>
         if(t.isInstanceOf[EndpointNotFound])
           Response.text("Not found")
@@ -306,7 +322,7 @@ class ExampleRoutes {
           Response.text("The error is " + t).status(Status
           .InternalServerError)
       }
-      .toHttpApp
+
 
 }
 

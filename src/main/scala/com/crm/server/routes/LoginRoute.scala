@@ -11,10 +11,9 @@ class LoginRoute {
     ViewRenderer.render(content.body)
   }
 
-  val apps: HttpApp[Any] = Routes(login)
+  val apps = Routes(login)
     .handleError { t: Throwable => Response.text("The error is " + t).status(Status
       .InternalServerError) }
-    .toHttpApp
 
   def handle(throwable: Throwable) = {
     Response.text("The error is " + throwable).status(Status.InternalServerError)

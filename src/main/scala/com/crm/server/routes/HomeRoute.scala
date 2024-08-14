@@ -24,10 +24,10 @@ class HomeRoute() {
 
 
 
-  val apps: HttpApp[Any] = Routes(index, about, contact)
+  val apps = Routes(index, about, contact)
     .handleError { t: Throwable => Response.text("The error is " + t).status(Status
       .InternalServerError) }
-    .toHttpApp
+
 
     def handle(throwable: Throwable) = {
       Response.text("The error is " + throwable).status(Status.InternalServerError)

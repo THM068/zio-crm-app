@@ -14,7 +14,8 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio" % "2.0.19",
       "dev.zio" %% "zio-json" % "0.6.1",
-      "dev.zio" %% "zio-http" % "3.0.0-RC4",
+      "dev.zio" %% "zio-http" % "3.0.1",
+//      "dev.zio" %% "zio-http" % "3.0.0-RC9+32-5294e91a-SNAPSHOT",
       "dev.zio" %% "zio-config" % "4.0.0-RC16",
       "dev.zio" %% "zio-config-typesafe" % "4.0.0-RC16",
       "dev.zio" %% "zio-config-magnolia" % "4.0.0-RC16",
@@ -25,7 +26,9 @@ lazy val root = (project in file("."))
       "dev.zio" %% "zio-streams" % "2.0.9",
       "dev.zio" %% "zio-crypto" % "0.0.0+120-8d0af0b1-SNAPSHOT",
       "dev.zio" %% "zio-prelude" % "1.0.0-RC21",
-      "dev.zio" %% "zio-test" % "2.0.19" % Test
+      "dev.zio" %% "zio-test" % "2.0.19" % Test,
+      "dev.zio" %% "zio-test-sbt"     % "2.1.9"  % Test,
+      "dev.zio" %% "zio-http-testkit" % "3.0.1" % Test
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
   )
