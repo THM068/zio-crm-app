@@ -187,3 +187,13 @@ object LocalDateUtil {
 case class Project(id: Int, name: String)
 
 case class TimeRegistration(projectId: Int, date: LocalDate, duration: Duration)
+
+object CarModelStore {
+  val modelMap: Map[String, List[String]] = Map(
+    "audi" -> List("A1","A2","A3"),
+    "toyota" -> List("Landcruiser","Tacoma","Yaris"),
+    "bmw" -> List("325i","325ix","X5"),
+  )
+
+  def getModel(car: String): List[String] = modelMap.getOrElse(car, List())
+}

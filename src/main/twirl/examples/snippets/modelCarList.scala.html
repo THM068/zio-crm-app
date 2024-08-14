@@ -1,0 +1,5 @@
+@(modelList: List[String])
+
+@for(model <- modelList) {
+    <option value='@{model}'>@{model}</option>
+}

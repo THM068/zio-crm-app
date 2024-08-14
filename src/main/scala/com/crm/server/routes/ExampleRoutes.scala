@@ -1,7 +1,7 @@
 package com.crm.server.routes
 import com.crm.model.DateFormater.toLocalDate
 import com.crm.model.LocalDateUtil.getDaysOfCurrentWeek
-import com.crm.model.{ContactInfo, Todo, TodoStore}
+import com.crm.model.{CarModelStore, ContactInfo, Todo, TodoStore}
 import com.crm.server.renderer.ViewRenderer
 import com.crm.server.renderer.ViewRenderer._
 import com.crm.server.routes.LoginValidation.validateLogin
@@ -288,8 +288,21 @@ class ExampleRoutes {
       ))
       render(content.body)
     }
+  }
 
+  val cascading_selects = Method.GET / "cascading-selects" -> handler {
+    val content = examples.html.cascadingSelects()
+    render(content.body)
+  }
 
+  val getCarModels = Method.GET / "models" -> handler {(request: Request) =>
+    val make = request.url.queryParams.get("make")
+    val carModels = make match {
+      case Some(c) => CarModelStore.getModel(c)
+      case _ => List()
+    }
+    val content = examples.snippets.html.modelCarList(modelList = carModels)
+    render(content.body)
   }
 
 
@@ -298,7 +311,8 @@ class ExampleRoutes {
       bulkUpdate, loadBulkContacts, activateContact, deActivateContact, deleteRowPage,
       loadDeleteRows, deleteRow, editRowPage, loadEditRows, getContactByIdForm, updateContact,
       getContactRow, validateMultiplefields, loadValidateMultipleFields, login, activeSearch,
-      search, jwt_as_cookie_page, oob_example_page, add_todo, timeSheet, updateTimesheet)
+      search, jwt_as_cookie_page, oob_example_page, add_todo, timeSheet, updateTimesheet, cascading_selects,
+      getCarModels)
       .handleError { t: Throwable =>
         if(t.isInstanceOf[EndpointNotFound])
           Response.text("Not found")
